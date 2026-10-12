@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boyz Codes | Cameroon Bus Ticketing</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-wide">🚌 Boyz Codes</h1>
+            <div class="space-x-6 hidden md:flex">
+                <a href="index.html" class="hover:text-blue-300 font-medium">Home</a>
+                <a href="#routes-section" class="hover:text-blue-300 font-medium">Search Routes</a>
+                <a href="my_bookings.html" class="hover:text-blue-300 font-medium">My Bookings</a>
+            </div>
+            <div>
+                <a href="#" class="bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-semibold px-4 py-2 rounded-lg shadow">Login / Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-r from-blue-800 to-blue-950 text-white py-16 px-4 text-center">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-4xl font-extrabold mb-4">Travel Across Cameroon with Ease</h2>
+            <p class="text-lg text-blue-200 mb-8">Fast, reliable, and secure bus ticketing from Buea, Douala, Bamenda, Yaoundé and more!</p>
+            
+            <!-- Search Box -->
+            <div class="bg-white p-6 rounded-xl shadow-xl text-gray-800 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-left">From</label>
+                    <select id="departureFilter" class="w-full border border-gray-300 rounded-lg p-3">
+                        <option value="">All Departure Cities</option>
+                        <option value="Buea">Buea</option>
+                        <option value="Douala">Douala</option>
+                        <option value="Bamenda">Bamenda</option>
+                        <option value="Yaoundé">Yaoundé</option>
+                        <option value="Limbe">Limbe</option>
+                        <option value="Bafoussam">Bafoussam</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-1 text-left">To</label>
+                    <select id="arrivalFilter" class="w-full border border-gray-300 rounded-lg p-3">
+                        <option value="">All Arrival Cities</option>
+                        <option value="Douala">Douala</option>
+                        <option value="Yaoundé">Yaoundé</option>
+                        <option value="Bafoussam">Bafoussam</option>
+                        <option value="Ngaoundéré">Ngaoundéré</option>
+                        <option value="Buea">Buea</option>
+                        <option value="Maroua">Maroua</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button onclick="loadRoutes()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold p-3 rounded-lg shadow transition">
+                        Search Buses
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Available Routes Section -->
+    <main id="routes-section" class="max-w-7xl mx-auto px-4 py-12">
+        <h3 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Available Travel Routes</h3>
+        <div id="routesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Routes will load dynamically here via JavaScript -->
+            <p class="text-gray-500">Loading available trips...</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-950 text-white text-center py-6 mt-12">
+        <p>&copy; 2026 Boyz Codes Travel Agency. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript to Fetch Routes -->
+    <script>
+        async function loadRoutes() {
+            const departure = document.getElementById('departureFilter').value;
+            const arrival = document.getElementById('arrivalFilter').value;
+            const container = document.getElementById('routesContainer');
+            
+            container.innerHTML = '<p class="text-blue-600 font-medium">Searching routes...</p>';
+
+            try {
+                let url = 'api/get_routes.php?';
+                if(departure) url += `departure=${encodeURIComponent(departure)}&`;
+                if(arrival) url += `arrival=${encodeURIComponent(arrival)}`;
+
+                const response = await fetch(url);
+                const result = await response.json();
+
+                if(result.status === 'success' && result.data.length > 0) {
+                    container.innerHTML = '';
+                    result.data.forEach(route => {
+                        container.innerHTML += `
+                            <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full">${route.departure_city} ➔ ${route.arrival_city}</span>
+                                        <span class="text-green-600 font-bold">${route.price_fcfa} XAF</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-1"><strong>Departure:</strong> ${route.departure_time}</p>
+                                    <p class="text-sm text-gray-600 mb-4"><strong>Seats Available:</strong> ${route.total_seats} seats</p>
+                                </div>
+                               <a href="book.html" class="block text-center w-full bg-yellow-500 hover:bg-yellow-600 text-blue-950 font-bold p-3 rounded-lg">Book Now</a>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-gray-500">No travel routes found matching your filter.</p>';
+                }
+            } catch (error) {
+                container.innerHTML = '<p class="text-red-500">Error connecting to server. Make sure XAMPP Apache is running.</p>';
+            }
+        }
+
+        // Load routes automatically when page opens
+        window.onload = loadRoutes;
+    </script>
+</body>
+</html>

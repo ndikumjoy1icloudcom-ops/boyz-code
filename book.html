@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seats | Neville's Safety Voyage</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-900 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold tracking-wide">🚌 Neville's Safety Voyage</a>
+            <div class="space-x-6 hidden md:flex font-medium">
+                <a href="index.html" class="hover:text-blue-300">Home</a>
+                <a href="index.html" class="hover:text-blue-300">Search Routes</a>
+                <a href="my_bookings.html" class="hover:text-blue-300">My Bookings</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Booking Section -->
+    <main class="max-w-6xl mx-auto px-4 py-10">
+        <h1 class="text-3xl font-bold text-blue-900 mb-2">Complete Your Booking</h1>
+        <p class="text-gray-600 mb-8">Select your preferred seat(s) for your trip.</p>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Seat Selection Grid (2 Columns) -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Bus Seat Layout</h2>
+                
+                <!-- Legend -->
+                <div class="flex space-x-6 mb-6 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-6 h-6 bg-gray-200 rounded inline-block"></span>
+                        <span>Available</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-6 h-6 bg-blue-600 rounded inline-block"></span>
+                        <span>Selected</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-6 h-6 bg-gray-400 rounded inline-block"></span>
+                        <span>Booked</span>
+                    </div>
+                </div>
+
+                <!-- Bus Cabin -->
+                <div class="border-2 border-dashed border-gray-300 p-6 rounded-lg max-w-sm mx-auto bg-gray-50">
+                    <div class="text-center font-bold text-gray-400 mb-6 border-b pb-2">Driver Front</div>
+                    
+                    <!-- Seats Grid Container -->
+                    <div id="seatGrid" class="grid grid-cols-4 gap-4 justify-items-center">
+                        <!-- Seats will be populated via JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Summary Card (1 Column) -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 h-fit">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Trip Summary</h2>
+                <div class="space-y-3 text-sm text-gray-600 border-b pb-4 mb-4">
+                    <p class="flex justify-between"><span>Route:</span> <strong id="summaryRoute" class="text-gray-900">Buea ➔ Douala</strong></p>
+                    <p class="flex justify-between"><span>Departure Time:</span> <strong class="text-gray-900">08:00 AM</strong></p>
+                    <p class="flex justify-between"><span>Price per seat:</span> <strong class="text-gray-900">2,500 XAF</strong></p>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-sm font-medium text-gray-700 mb-1">Selected Seats:</p>
+                    <div id="selectedSeatsDisplay" class="font-bold text-blue-600 text-lg">None selected</div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6 text-lg font-bold">
+                    <span>Total Amount:</span>
+                    <span id="totalPrice" class="text-blue-900">0 XAF</span>
+                </div>
+
+                <button onclick="confirmBooking()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow transition">
+                    Confirm & Book Ticket
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript for Seat Handling -->
+    <script>
+        const totalSeats = 28;
+        const seatPrice = 2500;
+        const bookedSeats = [3, 12, 15]; // Example of already taken seats
+        let selectedSeats = [];
+
+        const seatGrid = document.getElementById('seatGrid');
+        const selectedSeatsDisplay = document.getElementById('selectedSeatsDisplay');
+        const totalPriceDisplay = document.getElementById('totalPrice');
+
+        // Generate Seats
+        for (let i = 1; i <= totalSeats; i++) {
+            const seat = document.createElement('button');
+            seat.innerText = i;
+            seat.type = 'button';
+            seat.className = "w-10 h-10 rounded-lg font-semibold flex items-center justify-center text-sm transition";
+
+            if (bookedSeats.includes(i)) {
+                seat.classList.add('bg-gray-300', 'text-gray-500', 'cursor-not-allowed');
+                seat.disabled = true;
+            } else {
+                seat.classList.add('bg-gray-200', 'hover:bg-blue-200', 'text-gray-700');
+                seat.onclick = () => toggleSeat(i, seat);
+            }
+
+            seatGrid.appendChild(seat);
+        }
+function toggleSeat(seatNumber, element) {
+    const index = selectedSeats.indexOf(seatNumber);
+    if (index > -1) {
+        selectedSeats.splice(index, 1);
+        element.classList.remove('bg-blue-600', 'text-white');
+    } else {
+        selectedSeats.push(seatNumber);
+        element.classList.add('bg-blue-600', 'text-white');
+    }
+    updateSummary();
+}
+
+function toggleSeat(seatNumber, element) {
+    const index = selectedSeats.indexOf(seatNumber);
+    if (index > -1) {
+        selectedSeats.splice(index, 1);
+        element.classList.remove('bg-blue-600', 'text-white');
+    } else {
+        selectedSeats.push(seatNumber);
+        element.classList.add('bg-blue-600', 'text-white');
+    }
+    updateSummary();
+}
+
+async function confirmBooking() {
+    if (selectedSeats.length === 0) {
+        alert("Please select at least one seat before confirming.");
+        return;
+    }
+
+    const bookingData = {
+        route: "Buea ➔ Douala",
+        seats: selectedSeats.join(', '),
+        total_price: selectedSeats.length * seatPrice
+    };
+
+    try {
+        const response = await fetch('save_booking.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(bookingData)
+        });
+        
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            alert("Success! Your booking for seat(s) " + selectedSeats.join(', ') + " has been saved to the database.");
+            window.location.href = "index.html";
+        } else {
+            alert("Error: " + result.message);
+        }
+    } catch (error) {
+        alert("Error connecting to server. Make sure XAMPP Apache is running.");
+    }
+}
+
+        function updateSummary() {
+            if (selectedSeats.length === 0) {
+                selectedSeatsDisplay.innerText = "None selected";
+                totalPriceDisplay.innerText = "0 XAF";
+            } else {
+                selectedSeatsDisplay.innerText = selectedSeats.sort((a, b) => a - b).join(', ');
+                totalPriceDisplay.innerText = (selectedSeats.length * seatPrice).toLocaleString() + " XAF";
+            }
+        }
+
+        function confirmBooking() {
+            if (selectedSeats.length === 0) {
+                alert("Please select at least one seat before confirming.");
+                return;
+            }
+            alert("Success! Your booking for seat(s) " + selectedSeats.join(', ') + " has been registered.");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
